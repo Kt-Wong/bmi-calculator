@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BMI 结果</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; background: #121212; color: #eee; padding: 40px 20px; margin: 0; min-height: 100vh; }
+    h1 { color: #1e88e5; text-align: center; margin-bottom: 20px; }
+    .info, .advice, .target-weight { max-width: 420px; margin: 0 auto 30px auto; font-size: 18px; line-height: 1.5; }
+    canvas { max-width: 420px; width: 100%; background: #1f1f1f; border-radius: 16px; padding: 20px; margin: 20px auto; display: block; }
+    button { display: block; margin: 30px auto 0 auto; padding: 12px 24px; font-size: 16px; border-radius: 10px; border: none; cursor: pointer; background: #1e88e5; color: white; }
+  </style>
+</head>
+<body>
+  <h1>BMI 计算结果</h1>
+  <div class="info" id="info"></div>
+  <canvas id="bmiChart"></canvas>
+  <div class="advice" id="advice"></div>
+  <div class="target-weight" id="targetWeight"></div>
+  <canvas id="trendChart"></canvas>
+  <button onclick="window.history.back()">返回重新计算</button>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const bmi = parseFloat(params.get('bmi'));
+    const level = params.get('level');
+    const height = parseFloat(params.get('height'));
+    const weight = parseFloat(params.get('weight'));
+
+    const info = document.getElementById('info');
+    const advice = document.getElementById('advice');
+    const targetWeight = document.getElementById('targetWeight');
+
+    if (!bmi || !level || !height || !weight) {
+      info.textContent = '无效的结果，请返回重新输入。';
+    } else {
+      // 基础信息
+      info.innerHTML = `
+        身高：${height} cm<br>
+        体重：${weight} kg<br>
+        你的 BMI 是 <strong>${bmi.toFixed(2)}</strong><br>
+        状态：<strong>${level}</strong>
+      `;
+
+      // 健康建议
+      const adviceMap = {
+        "偏瘦": "建议适当增加营养摄入，合理锻炼，增强体质。",
+        "正常": "保持当前的生活习惯，继续保持健康状态。",
+        "超重": "建议控制饮食，增加运动，逐步减重。",
+        "肥胖": "建议咨询专业医生，制定科学的减肥计划。"
+      };
+      advice.textContent = "健康建议： " + (adviceMap[level] || "");
+
+      // 体重目标区间（正常BMI范围18.5-24）
+      const minNormalWeight = (18.5 * (height/100) ** 2).toFixed(1);
+      const maxNormalWeight = (24 * (height/100) ** 2).toFixed(1);
+
+      targetWeight.innerHTML = `理想体重范围：${minNormalWeight} kg - ${maxNormalWeight} kg`;
+
+      // BMI区间图
+      const ctx = document.getElementById('bmiChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['偏瘦', '正常', '超重', '肥胖'],
+          datasets: [{
+            label: 'BMI区间上限',
+            data: [18.5, 24, 28, 40],
+            backgroundColor: [
+              'rgba(255, 152, 0, 0.5)',
+              'rgba(76, 175, 80, 0.5)',
+              'rgba(244, 67, 54, 0.5)',
+              'rgba(183, 28, 28, 0.5)'
+            ],
+            borderWidth: 0
+          },{
+            label: '你的BMI',
+            data: [bmi, 0, 0, 0],
+            type: 'line',
+            fill: false,
+            borderColor: '#1e88e5',
+            borderWidth: 3,
+            pointRadius: 6,
+            pointBackgroundColor: '#1e88e5',
+            showLine: false
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          scales: {
+            x: { max: 40, min: 10, ticks: { stepSize: 5, color: '#eee' }, grid: { color: '#444' } },
+            y: { ticks: { color: '#eee' }, grid: { display: false } }
+          },
+          plugins: { legend: { labels: { color: '#eee' } } }
+        }
+      });
+
+      // 模拟BMI变化趋势数据（假设用户过去5次体重数据）
+      // 你可以根据实际情况替换数据或改为从后端加载
+      const trendLabels = ["1个月前", "3周前", "2周前", "1周前", "当前"];
+      // 模拟的体重数据（kg）
+      const trendWeights = [weight - 2, weight - 1.5, weight - 1, weight - 0.5, weight];
+      // 计算对应BMI
+      const trendBMIs = trendWeights.map(w => +(w / ((height/100)**2)).toFixed(2));
+
+      const ctxTrend = document.getElementById('trendChart').getContext('2d');
+      new Chart(ctxTrend, {
+        type: 'line',
+        data: {
+          labels: trendLabels,
+          datasets: [{
+            label: 'BMI变化趋势',
+            data: trendBMIs,
+            borderColor: '#1e88e5',
+            backgroundColor: 'rgba(30, 136, 229, 0.3)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 5,
+            pointBackgroundColor: '#1e88e5'
+          }]
+        },
+        options: {
+          scales: {
+            y: {
+              min: 10,
+              max: 40,
+              ticks: { stepSize: 5, color: '#eee' },
+              grid: { color: '#444' }
+            },
+            x: {
+              ticks: { color: '#eee' },
+              grid: { color: '#444' }
+            }
+          },
+          plugins: {
+            legend: { labels: { color: '#eee' } }
+          }
+        }
+      });
+    }
+  </script>
+</body>
+</html>

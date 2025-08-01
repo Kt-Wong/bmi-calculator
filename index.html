@@ -4,265 +4,127 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BMI 计算器</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
   <style>
-    :root {
-      --primary: #1e88e5;
-      --bg: #121212;
-      --card-bg: #1f1f1f;
-      --input-bg: #2a2a2a;
-      --text: #eee;
-    }
-    /* 白天亮色模式变量 */
-    body.light {
-      --primary: #1e88e5;
-      --bg: #f0f0f0;
-      --card-bg: #ffffff;
-      --input-bg: #fafafa;
-      --text: #121212;
-    }
-
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
       font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      background: #121212;
+      color: #eee;
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      transition: background-color 0.5s, color 0.5s;
-      position: relative; /* 使切换按钮定位参考 */
+      height: 100vh;
     }
-
     .card {
-      background: var(--card-bg);
+      background: #1f1f1f;
       padding: 40px;
       border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       width: 90%;
       max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
       text-align: center;
-      transition: background-color 0.5s;
     }
-
-    body.light .card {
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-    }
-
     h1 {
-      color: var(--primary);
-      font-size: 26px;
+      color: #1e88e5;
       margin-bottom: 30px;
     }
-
     label {
       display: block;
-      font-size: 15px;
       text-align: left;
-      margin: 0 auto 6px auto;
+      margin: 0 auto 6px;
       width: 80%;
       max-width: 300px;
       color: #ccc;
+      font-size: 15px;
     }
-
-    body.light label {
-      color: #666;
-    }
-
     input {
       width: 80%;
       max-width: 300px;
       padding: 14px 16px;
       font-size: 16px;
-      background: var(--input-bg);
-      color: var(--text);
+      background: #2a2a2a;
+      color: #eee;
       border: 1px solid #444;
       border-radius: 10px;
-      outline: none;
+      margin: 0 auto 20px;
       display: block;
-      margin: 0 auto 20px auto;
-      transition: background-color 0.5s, color 0.5s, border-color 0.5s;
+      outline: none;
     }
-
     input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.2);
+      border-color: #1e88e5;
+      box-shadow: 0 0 0 3px rgba(30,136,229,0.2);
     }
-
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type=number] {
-      -moz-appearance: textfield;
-    }
-
-    button.calculate-btn {
+    button {
       width: 80%;
       max-width: 300px;
       padding: 14px;
-      margin: 20px auto 0 auto;
-      background-color: var(--primary);
+      background-color: #1e88e5;
       color: white;
       border: none;
       border-radius: 10px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      display: block;
       transition: background-color 0.3s;
+      display: block;
+      margin: 0 auto;
     }
-
-    button.calculate-btn:hover {
+    button:hover {
       background-color: #1565c0;
     }
-
-    .result {
-      margin-top: 25px;
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .badge {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 8px 16px;
-      border-radius: 20px;
-      color: white;
+    .error {
+      color: #f44336;
+      margin-top: 15px;
       font-size: 14px;
-      font-weight: 600;
-    }
-
-    .thin { background: #ff9800; }
-    .normal { background: #4caf50; }
-    .overweight { background: #f44336; }
-    .obese { background: #b71c1c; }
-
-    /* 切换明暗模式图标按钮 */
-    #toggleTheme {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 36px;
-      height: 36px;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      outline: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.3s;
-    }
-
-    #toggleTheme:hover {
-      transform: scale(1.1);
-    }
-
-    /* svg图标颜色跟随文本颜色 */
-    #toggleTheme svg {
-      fill: var(--text);
-      width: 24px;
-      height: 24px;
-      transition: fill 0.5s;
     }
   </style>
 </head>
 <body>
-  <button id="toggleTheme" aria-label="切换明暗模式" title="切换明暗模式">
-    <!-- 默认先显示月亮图标，JS 会根据模式切换 -->
-    <svg id="icon" viewBox="0 0 24 24" >
-      <path d="M21.75 15.5a9 9 0 01-11.29-11.29 7 7 0 1011.29 11.29z"/>
-    </svg>
-  </button>
-
   <div class="card">
     <h1>BMI 计算器</h1>
-
     <label for="height">身高（厘米）</label>
-    <input type="number" id="height" placeholder="请输入身高">
-
+    <input type="text" id="height" placeholder="请输入身高，单位厘米" step="any" />
     <label for="weight">体重（公斤）</label>
-    <input type="number" id="weight" placeholder="请输入体重">
-
-    <button class="calculate-btn" onclick="calculateBMI()">计算</button>
-
-    <div class="result" id="result"></div>
+    <input type="text" id="weight" placeholder="请输入体重，单位公斤" step="any" />
+    <button id="calculateBtn">计算</button>
+    <div class="error" id="errorMsg"></div>
   </div>
 
   <script>
-    function calculateBMI() {
-      const height = parseFloat(document.getElementById("height").value);
-      const weight = parseFloat(document.getElementById("weight").value);
-      const result = document.getElementById("result");
+    const heightInput = document.getElementById('height');
+    const weightInput = document.getElementById('weight');
+    const errorMsg = document.getElementById('errorMsg');
+    const calculateBtn = document.getElementById('calculateBtn');
 
-      if (!height || !weight || height <= 0 || weight <= 0) {
-        result.innerHTML = "❗请输入有效的身高和体重。";
+    function getLevel(bmi) {
+      if (bmi < 18.5) return "偏瘦";
+      if (bmi < 24) return "正常";
+      if (bmi < 28) return "超重";
+      return "肥胖";
+    }
+
+    calculateBtn.addEventListener('click', () => {
+      errorMsg.textContent = '';
+      const height = parseFloat(heightInput.value);
+      const weight = parseFloat(weightInput.value);
+
+      if (!height || height <= 0 || height < 30 || height > 300) {
+        errorMsg.textContent = '请输入有效的身高（30-300厘米）';
+        return;
+      }
+      if (!weight || weight <= 0 || weight < 2 || weight > 500) {
+        errorMsg.textContent = '请输入有效的体重（2-500公斤）';
         return;
       }
 
       const heightM = height / 100;
       const bmi = weight / (heightM * heightM);
-      let level = "";
-      let badgeClass = "";
+      const level = getLevel(bmi);
 
-      if (bmi < 18.5) {
-        level = "偏瘦";
-        badgeClass = "thin";
-      } else if (bmi < 24) {
-        level = "正常";
-        badgeClass = "normal";
-      } else if (bmi < 28) {
-        level = "超重";
-        badgeClass = "overweight";
-      } else {
-        level = "肥胖";
-        badgeClass = "obese";
-      }
-
-      result.innerHTML = `
-        你的 BMI 是 <strong>${bmi.toFixed(2)}</strong><br>
-        <span class="badge ${badgeClass}">状态：${level}</span>
-      `;
-    }
-
-    const toggleBtn = document.getElementById('toggleTheme');
-    const icon = document.getElementById('icon');
-
-    function setIcon(isLight) {
-      if (isLight) {
-        // 太阳图标
-        icon.innerHTML = `
-          <path d="M6.76 4.84l-1.8-1.79-1.42 1.42 1.79 1.8 1.43-1.43zM1 11h3v2H1v-2zm10-9h2v3h-2V2zm7.66 3.46l-1.42-1.42-1.79 1.8 1.42 1.42 1.79-1.8zM17 11h3v2h-3v-2zm-6 5a5 5 0 100-10 5 5 0 000 10zm7.66 2.54l1.79 1.8 1.42-1.42-1.8-1.79-1.41 1.41zM13 20h-2v3h2v-3zm-7.66-2.54l1.42 1.42 1.79-1.8-1.42-1.42-1.79 1.8z"/>
-        `;
-      } else {
-        // 月亮图标
-        icon.innerHTML = `
-          <path d="M21.75 15.5a9 9 0 01-11.29-11.29 7 7 0 1011.29 11.29z"/>
-        `;
-      }
-    }
-
-    // 自动根据时间切换主题（7点-19点为白天）
-    function autoTheme() {
-      const hour = new Date().getHours();
-      if (hour >= 7 && hour < 19) {
-        document.body.classList.add('light');
-        setIcon(true);
-      } else {
-        document.body.classList.remove('light');
-        setIcon(false);
-      }
-    }
-
-    autoTheme();
-
-    toggleBtn.addEventListener('click', () => {
-      const isLight = document.body.classList.toggle('light');
-      setIcon(isLight);
+      // 跳转并传参到 result.html
+      const url = `result.html?height=${height}&weight=${weight}&bmi=${bmi.toFixed(2)}&level=${encodeURIComponent(level)}`;
+      window.location.href = url;
     });
   </script>
 </body>
