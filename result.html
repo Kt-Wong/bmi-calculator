@@ -19,7 +19,6 @@
   <canvas id="bmiChart"></canvas>
   <div class="advice" id="advice"></div>
   <div class="target-weight" id="targetWeight"></div>
-  <canvas id="trendChart"></canvas>
   <button onclick="window.history.back()">返回重新计算</button>
 
   <script>
@@ -36,7 +35,6 @@
     if (!bmi || !level || !height || !weight) {
       info.textContent = '无效的结果，请返回重新输入。';
     } else {
-      // 基础信息
       info.innerHTML = `
         身高：${height} cm<br>
         体重：${weight} kg<br>
@@ -44,7 +42,6 @@
         状态：<strong>${level}</strong>
       `;
 
-      // 健康建议
       const adviceMap = {
         "偏瘦": "建议适当增加营养摄入，合理锻炼，增强体质。",
         "正常": "保持当前的生活习惯，继续保持健康状态。",
@@ -53,13 +50,10 @@
       };
       advice.textContent = "健康建议： " + (adviceMap[level] || "");
 
-      // 体重目标区间（正常BMI范围18.5-24）
       const minNormalWeight = (18.5 * (height/100) ** 2).toFixed(1);
       const maxNormalWeight = (24 * (height/100) ** 2).toFixed(1);
-
       targetWeight.innerHTML = `理想体重范围：${minNormalWeight} kg - ${maxNormalWeight} kg`;
 
-      // BMI区间图 — 带炫酷发光点和标签
       const ctx = document.getElementById('bmiChart').getContext('2d');
       new Chart(ctx, {
         type: 'bar',
@@ -100,11 +94,9 @@
             else yPos = yAxis.getPixelForTick(3);
 
             const xPos = xAxis.getPixelForValue(bmi);
-
             const radius = 10;
             const glowRadius = 20;
 
-            // 发光圆点
             ctx.save();
             ctx.shadowColor = 'rgba(30, 136, 229, 0.7)';
             ctx.shadowBlur = glowRadius;
@@ -114,13 +106,11 @@
             ctx.fill();
             ctx.restore();
 
-            // 内部实心圆
             ctx.fillStyle = '#90caf9';
             ctx.beginPath();
             ctx.arc(xPos, yPos, radius * 0.6, 0, 2 * Math.PI);
             ctx.fill();
 
-            // 标签框
             const label = `BMI: ${bmi.toFixed(2)}`;
             ctx.font = 'bold 14px Inter, sans-serif';
             ctx.fillStyle = '#1e88e5';
@@ -135,7 +125,6 @@
             const rectX = xPos - rectWidth / 2;
             const rectY = yPos - radius - rectHeight - 8;
 
-            // 圆角矩形背景
             const radiusRect = 6;
             ctx.beginPath();
             ctx.moveTo(rectX + radiusRect, rectY);
@@ -153,51 +142,10 @@
             ctx.fill();
             ctx.stroke();
 
-            // 文字
             ctx.fillStyle = '#1e88e5';
             ctx.fillText(label, rectX + padding, rectY + rectHeight / 1.5);
           }
         }]
-      });
-
-      // 模拟BMI变化趋势数据
-      const trendLabels = ["1个月前", "3周前", "2周前", "1周前", "当前"];
-      const trendWeights = [weight - 2, weight - 1.5, weight - 1, weight - 0.5, weight];
-      const trendBMIs = trendWeights.map(w => +(w / ((height/100)**2)).toFixed(2));
-
-      const ctxTrend = document.getElementById('trendChart').getContext('2d');
-      new Chart(ctxTrend, {
-        type: 'line',
-        data: {
-          labels: trendLabels,
-          datasets: [{
-            label: 'BMI变化趋势',
-            data: trendBMIs,
-            borderColor: '#1e88e5',
-            backgroundColor: 'rgba(30, 136, 229, 0.3)',
-            fill: true,
-            tension: 0.3,
-            pointRadius: 5,
-            pointBackgroundColor: '#1e88e5'
-          }]
-        },
-        options: {
-          scales: {
-            y: {
-              min: 10,
-              max: 40,
-              ticks: { stepSize: 5, color: '#eee' },
-              grid: { color: '#444' }
-            },
-            x: {
-              ticks: { color: '#eee' },
-              grid: { color: '#444' }
-            }
-          },
-          plugins: {
-            legend: { labels: { color: '#eee' } }
-          }
-        }
       });
     }
   </script>
